@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import RegisterForm from "./components/forms/RegisterForm.jsx";
+import ApplicationForm from "./components/forms/ApplicationForm.jsx";
 
 function App() {
   const [email, setEmail] = useState("");
@@ -43,6 +44,10 @@ function App() {
     setToken(null);
   }
 
+async function handleCreated(newApplication) {
+  setApplications([...applications, newApplication]);
+}
+
   async function fetchApplications(authToken) {
     const response = await fetch("http://localhost:3000/applications", {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -85,6 +90,12 @@ function App() {
               ))}
             </ul>
           )}
+          <div>
+            <h2 className='text-lg font-medium mb-3 mt-2'>
+              Add a New Application
+            </h2>
+            <ApplicationForm token={token} onCreated={handleCreated} />
+          </div>
         </div>
       </div>
     );
