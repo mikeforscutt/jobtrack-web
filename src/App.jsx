@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import RegisterForm from "./components/forms/RegisterForm.jsx";
 
 function App() {
   const [email, setEmail] = useState("");
@@ -6,8 +7,17 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [error, setError] = useState("");
   const [applications, setApplications] = useState([]);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
 
-  async function handleSubmit(e) {
+  function handleRegisterClick() {
+    setShowRegisterForm(true);
+  }
+
+  function handleBackToLoginClick() {
+    setShowRegisterForm(false);
+  }
+
+  async function handleLogin(e) {
     e.preventDefault();
     setError("");
 
@@ -63,10 +73,22 @@ function App() {
     );
   }
 
+  if (showRegisterForm) {
+    return (
+      <div>
+        <h1>Job Track</h1>
+        <RegisterForm onSuccess={handleBackToLoginClick} />
+        <button type='button' onClick={handleBackToLoginClick}>
+          Back to Login
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1>Job Track</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleLogin}>
         <input
           type='email'
           placeholder='Email'
@@ -79,9 +101,12 @@ function App() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type='submit'>Log in</button>
         {error && <p style={{ color: "red" }}>{error}</p>}
+        <button type='submit'>Log in</button>
       </form>
+      <button type='button' onClick={handleRegisterClick}>
+        Register
+      </button>
     </div>
   );
 }
