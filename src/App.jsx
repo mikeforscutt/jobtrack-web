@@ -10,6 +10,12 @@ function App() {
   const [applications, setApplications] = useState([]);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
 
+  // Editing state: which application (by id) is currently being edited,
+  // plus draft values the user is typing before they hit Save.
+  const [editingApplication, setEditingApplication] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+
   function handleRegisterClick() {
     setShowRegisterForm(true);
   }
@@ -44,9 +50,65 @@ function App() {
     setToken(null);
   }
 
-async function handleCreated(newApplication) {
-  setApplications([...applications, newApplication]);
-}
+  async function handleDelete(applicationId) {
+    const response = await fetch(
+      `http://localhost:3000/applications/${applicationId}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+
+    if (response.ok) {
+      setApplications(applications.filter((app) => app.id !== applicationId));
+    }
+  }
+
+  // Step 1: open the edit form for a specific application,
+  // pre-filling the draft state with its current values.
+  function handleEditClick(app) {
+    setEditingApplication(app.id);
+    setEditName(app.name);
+    setEditDescription(app.description);
+  }
+
+  // Step 2: actually save the edit, using the draft state.
+  async function handleEditSave(e) {
+    e.preventDefault();
+    setError("");
+
+    const response = await fetch(
+      `http://localhost:3000/applications/${editingApplication}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: editName, description: editDescription }),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.error);
+      return;
+    }
+
+    setApplications(
+      applications.map((app) => (app.id === editingApplication ? data : app)),
+    );
+    setEditingApplication(null);
+  }
+
+  function handleEditCancel() {
+    setEditingApplication(null);
+  }
+
+  async function handleCreated(newApplication) {
+    setApplications([...applications, newApplication]);
+  }
 
   async function fetchApplications(authToken) {
     const response = await fetch("http://localhost:3000/applications", {
@@ -75,6 +137,7 @@ async function handleCreated(newApplication) {
               Log out
             </button>
           </div>
+
           {applications.length === 0 ? (
             <p className='text-slate-400 text-sm'>No applications yet.</p>
           ) : (
@@ -84,14 +147,71 @@ async function handleCreated(newApplication) {
                   key={app.id}
                   className='bg-slate-900 border border-slate-700 rounded-md p-3'
                 >
-                  <p className='font-medium'>{app.name}</p>
-                  <p className='text-sm text-slate-400'>{app.description}</p>
+                  {editingApplication === app.id ? (
+                    <form
+                      onSubmit={handleEditSave}
+                      className='flex flex-col gap-3'
+                    >
+                      <input
+                        type='text'
+                        placeholder='Company name'
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
+                      />
+                      <input
+                        type='text'
+                        placeholder='Role / description'
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
+                      />
+                      {error && <p className='text-red-400 text-sm'>{error}</p>}
+                      <div className='flex gap-2'>
+                        <button
+                          type='submit'
+                          className='bg-blue-600 hover:bg-blue-700 rounded-md py-2 px-4 font-medium transition-colors'
+                        >
+                          Save
+                        </button>
+                        <button
+                          type='button'
+                          onClick={handleEditCancel}
+                          className='text-sm text-slate-400 hover:text-slate-200'
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <p className='font-medium'>{app.name}</p>
+                      <p className='text-sm text-slate-400'>
+                        {app.description}
+                      </p>
+                      <div className='flex gap-3 mt-2'>
+                        <button
+                          onClick={() => handleEditClick(app)}
+                          className='text-sm text-blue-400 hover:text-blue-500'
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(app.id)}
+                          className='text-sm text-red-400 hover:text-red-500'
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>
           )}
+
           <div>
-            <h2 className='text-lg font-medium mb-3 mt-2'>
+            <h2 className='text-lg font-medium mb-3 mt-6'>
               Add a New Application
             </h2>
             <ApplicationForm token={token} onCreated={handleCreated} />
