@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+
 function RegisterForm({ onSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,22 +28,31 @@ function RegisterForm({ onSuccess }) {
   }
 
   return (
-    <form onSubmit={handleRegister}>
+    <form onSubmit={handleRegister} className='flex flex-col gap-3'>
       <input
-        type="email"
-        placeholder="Email"
+        type='email'
+        placeholder='Email'
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
       />
       <input
-        type="password"
-        placeholder="Password"
+        type='password'
+        placeholder='Password'
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
       />
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-      <button type="submit">Register</button>
+      {error && <p className='text-red-400 text-sm'>{error}</p>}
+      {successMessage && (
+        <p className='text-green-400 text-sm'>{successMessage}</p>
+      )}
+      <button
+        type='submit'
+        className='bg-blue-600 hover:bg-blue-700 rounded-md py-2 font-medium transition-colors'
+      >
+        Register
+      </button>
     </form>
   );
 }
