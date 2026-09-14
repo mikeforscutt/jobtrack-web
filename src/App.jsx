@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [error, setError] = useState("");
+  const [applications, setApplications] = useState([]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -27,11 +28,37 @@ function App() {
     setToken(data.token);
   }
 
+  function handleLogout() {
+    localStorage.removeItem("token");
+    setToken(null);
+  }
+
+  async function fetchApplications(authToken) {
+    const response = await fetch("http://localhost:3000/applications", {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    const data = await response.json();
+    setApplications(data);
+  }
+
+  useEffect(() => {
+    if (token) {
+      fetchApplications(token);
+    }
+  }, [token]);
+
   if (token) {
     return (
       <div>
         <h1>Job Track</h1>
-        <p>You're logged in.</p>
+        <button onClick={handleLogout}>Log out</button>
+        <ul>
+          {applications.map((app) => (
+            <li key={app.id}>
+              {app.name} — {app.description}
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
