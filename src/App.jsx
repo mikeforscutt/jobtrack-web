@@ -9,6 +9,7 @@ function App() {
   const [error, setError] = useState("");
   const [applications, setApplications] = useState([]);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [editStatus, setEditStatus] = useState("applied");
 
   // Editing state: which application (by id) is currently being edited,
   // plus draft values the user is typing before they hit Save.
@@ -70,6 +71,7 @@ function App() {
     setEditingApplication(app.id);
     setEditName(app.name);
     setEditDescription(app.description);
+    setEditStatus(app.status);
   }
 
   // Step 2: actually save the edit, using the draft state.
@@ -85,7 +87,11 @@ function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: editName, description: editDescription }),
+        body: JSON.stringify({
+          name: editName,
+          description: editDescription,
+          status: editStatus,
+        }),
       },
     );
 
@@ -166,6 +172,16 @@ function App() {
                         onChange={(e) => setEditDescription(e.target.value)}
                         className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
                       />
+                      <select
+                        value={editStatus}
+                        onChange={(e) => setEditStatus(e.target.value)}
+                        className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
+                      >
+                        <option value='applied'>Applied</option>
+                        <option value='interviewing'>Interviewing</option>
+                        <option value='offered'>Offered</option>
+                        <option value='rejected'>Rejected</option>
+                      </select>
                       {error && <p className='text-red-400 text-sm'>{error}</p>}
                       <div className='flex gap-2'>
                         <button
@@ -188,6 +204,9 @@ function App() {
                       <p className='font-medium'>{app.name}</p>
                       <p className='text-sm text-slate-400'>
                         {app.description}
+                      </p>
+                      <p className='text-sm text-slate-400'>
+                        Status: {app.status}
                       </p>
                       <div className='flex gap-3 mt-2'>
                         <button
