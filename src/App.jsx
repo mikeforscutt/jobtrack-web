@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RegisterForm from "./components/forms/RegisterForm.jsx";
 import ApplicationForm from "./components/forms/ApplicationForm.jsx";
+import Layout from "./components/layout/Layout.jsx";
 
 function App() {
   const [email, setEmail] = useState("");
@@ -11,8 +12,6 @@ function App() {
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [editStatus, setEditStatus] = useState("applied");
 
-  // Editing state: which application (by id) is currently being edited,
-  // plus draft values the user is typing before they hit Save.
   const [editingApplication, setEditingApplication] = useState(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
@@ -65,8 +64,6 @@ function App() {
     }
   }
 
-  // Step 1: open the edit form for a specific application,
-  // pre-filling the draft state with its current values.
   function handleEditClick(app) {
     setEditingApplication(app.id);
     setEditName(app.name);
@@ -74,7 +71,6 @@ function App() {
     setEditStatus(app.status);
   }
 
-  // Step 2: actually save the edit, using the draft state.
   async function handleEditSave(e) {
     e.preventDefault();
     setError("");
@@ -132,18 +128,8 @@ function App() {
 
   if (token) {
     return (
-      <div className='min-h-screen bg-slate-900 text-slate-100 flex items-start justify-center pt-20 px-4'>
+      <Layout token={token} onLogout={handleLogout}>
         <div className='w-full max-w-md bg-slate-800 rounded-xl shadow-lg p-8'>
-          <div className='flex justify-between items-center mb-6'>
-            <h1 className='text-2xl font-semibold'>Job Track</h1>
-            <button
-              onClick={handleLogout}
-              className='text-sm border border-slate-600 rounded-md px-3 py-1.5 hover:bg-slate-700 transition-colors'
-            >
-              Log out
-            </button>
-          </div>
-
           {applications.length === 0 ? (
             <p className='text-slate-400 text-sm'>No applications yet.</p>
           ) : (
@@ -236,15 +222,14 @@ function App() {
             <ApplicationForm token={token} onCreated={handleCreated} />
           </div>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   if (showRegisterForm) {
     return (
-      <div className='min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center px-4'>
+      <Layout token={token} onLogout={handleLogout}>
         <div className='w-full max-w-md bg-slate-800 rounded-xl shadow-lg p-8'>
-          <h1 className='text-2xl font-semibold text-center mb-6'>Job Track</h1>
           <RegisterForm onSuccess={handleBackToLoginClick} />
           <button
             type='button'
@@ -254,14 +239,13 @@ function App() {
             Back to login
           </button>
         </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className='min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center px-4'>
+    <Layout token={token} onLogout={handleLogout}>
       <div className='w-full max-w-md bg-slate-800 rounded-xl shadow-lg p-8'>
-        <h1 className='text-2xl font-semibold text-center mb-6'>Job Track</h1>
         <form onSubmit={handleLogin} className='flex flex-col gap-3'>
           <input
             type='email'
@@ -293,7 +277,7 @@ function App() {
           Don't have an account? Register
         </button>
       </div>
-    </div>
+    </Layout>
   );
 }
 
