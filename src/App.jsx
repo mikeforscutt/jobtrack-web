@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import ApplicationsPage from "./pages/ApplicationsPage.jsx";
@@ -9,19 +10,19 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [error, setError] = useState("");
   const [applications, setApplications] = useState([]);
-  const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [editStatus, setEditStatus] = useState("applied");
+  const navigate = useNavigate();
 
   const [editingApplication, setEditingApplication] = useState(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
   function handleRegisterClick() {
-    setShowRegisterForm(true);
+    navigate("/register");
   }
 
   function handleBackToLoginClick() {
-    setShowRegisterForm(false);
+    navigate("/login");
   }
 
   async function handleLogin(e) {
@@ -43,11 +44,13 @@ function App() {
 
     localStorage.setItem("token", data.token);
     setToken(data.token);
+    navigate("/applications");
   }
 
   function handleLogout() {
     localStorage.removeItem("token");
     setToken(null);
+    navigate("/login");
   }
 
   async function handleDelete(applicationId) {
@@ -126,52 +129,63 @@ function App() {
     }
   }, [token]);
 
-  if (token) {
-    return (
-      <ApplicationsPage
-        token={token}
-        onLogout={handleLogout}
-        applications={applications}
-        error={error}
-        editingApplication={editingApplication}
-        editName={editName}
-        setEditName={setEditName}
-        editDescription={editDescription}
-        setEditDescription={setEditDescription}
-        editStatus={editStatus}
-        setEditStatus={setEditStatus}
-        handleEditClick={handleEditClick}
-        handleEditSave={handleEditSave}
-        handleEditCancel={handleEditCancel}
-        handleDelete={handleDelete}
-        handleCreated={handleCreated}
-      />
-    );
-  }
-
-  if (showRegisterForm) {
-    return (
-      <RegisterPage
-        onSuccess={handleBackToLoginClick}
-        handleBackToLoginClick={handleBackToLoginClick}
-        token={token}
-        onLogout={handleLogout}
-      />
-    );
-  }
-
   return (
-    <LoginPage
-      email={email}
-      setEmail={setEmail}
-      password={password}
-      setPassword={setPassword}
-      error={error}
-      handleLogin={handleLogin}
-      handleRegisterClick={handleRegisterClick}
-      token={token}
-      onLogout={handleLogout}
-    />
+    <Routes>
+      <Route
+        path='/login'
+        element={
+          <LoginPage
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            error={error}
+            handleLogin={handleLogin}
+            handleRegisterClick={handleRegisterClick}
+            token={token}
+            onLogout={handleLogout}
+          />
+        }
+      />
+      <Route
+        path='/register'
+        element={
+          <RegisterPage
+            onSuccess={handleBackToLoginClick}
+            handleBackToLoginClick={handleBackToLoginClick}
+            token={token}
+            onLogout={handleLogout}
+          />
+        }
+      />
+      <Route
+        path='/applications'
+        element={
+          <ApplicationsPage
+            token={token}
+            onLogout={handleLogout}
+            applications={applications}
+            error={error}
+            editingApplication={editingApplication}
+            editName={editName}
+            setEditName={setEditName}
+            editDescription={editDescription}
+            setEditDescription={setEditDescription}
+            editStatus={editStatus}
+            setEditStatus={setEditStatus}
+            handleEditClick={handleEditClick}
+            handleEditSave={handleEditSave}
+            handleEditCancel={handleEditCancel}
+            handleDelete={handleDelete}
+            handleCreated={handleCreated}
+          />
+        }
+      />
+      <Route
+        path='*'
+        element={<Navigate to={token ? "/applications" : "/login"} />}
+      />
+    </Routes>
   );
 }
 
