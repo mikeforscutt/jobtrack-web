@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import RegisterForm from "./components/forms/RegisterForm.jsx";
 import ApplicationForm from "./components/forms/ApplicationForm.jsx";
 import Layout from "./components/layout/Layout.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
 
 function App() {
   const [email, setEmail] = useState("");
@@ -226,58 +228,29 @@ function App() {
     );
   }
 
-  if (showRegisterForm) {
-    return (
-      <Layout token={token} onLogout={handleLogout}>
-        <div className='w-full max-w-md bg-slate-800 rounded-xl shadow-lg p-8'>
-          <RegisterForm onSuccess={handleBackToLoginClick} />
-          <button
-            type='button'
-            onClick={handleBackToLoginClick}
-            className='w-full mt-3 text-sm text-slate-400 hover:text-slate-200 transition-colors'
-          >
-            Back to login
-          </button>
-        </div>
-      </Layout>
-    );
-  }
+ if (showRegisterForm) {
+   return (
+     <RegisterPage
+       onSuccess={handleBackToLoginClick}
+       handleBackToLoginClick={handleBackToLoginClick}
+       token={token}
+       onLogout={handleLogout}
+     />
+   );
+ }
 
   return (
-    <Layout token={token} onLogout={handleLogout}>
-      <div className='w-full max-w-md bg-slate-800 rounded-xl shadow-lg p-8'>
-        <form onSubmit={handleLogin} className='flex flex-col gap-3'>
-          <input
-            type='email'
-            placeholder='Email'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
-          />
-          <input
-            type='password'
-            placeholder='Password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
-          />
-          {error && <p className='text-red-400 text-sm'>{error}</p>}
-          <button
-            type='submit'
-            className='bg-blue-600 hover:bg-blue-700 rounded-md py-2 font-medium transition-colors'
-          >
-            Log in
-          </button>
-        </form>
-        <button
-          type='button'
-          onClick={handleRegisterClick}
-          className='w-full mt-3 text-sm text-slate-400 hover:text-slate-200 transition-colors'
-        >
-          Don't have an account? Register
-        </button>
-      </div>
-    </Layout>
+    <LoginPage
+      email={email}
+      setEmail={setEmail}
+      password={password}
+      setPassword={setPassword}
+      error={error}
+      handleLogin={handleLogin}
+      handleRegisterClick={handleRegisterClick}
+      token={token}
+      onLogout={handleLogout}
+    />
   );
 }
 
