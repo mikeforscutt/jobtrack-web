@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import RegisterForm from "./components/forms/RegisterForm.jsx";
-import ApplicationForm from "./components/forms/ApplicationForm.jsx";
-import Layout from "./components/layout/Layout.jsx";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
+import ApplicationsPage from "./pages/ApplicationsPage.jsx";
 
 function App() {
   const [email, setEmail] = useState("");
@@ -9,19 +10,19 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [error, setError] = useState("");
   const [applications, setApplications] = useState([]);
-  const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [editStatus, setEditStatus] = useState("applied");
+  const navigate = useNavigate();
 
   const [editingApplication, setEditingApplication] = useState(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
 
   function handleRegisterClick() {
-    setShowRegisterForm(true);
+    navigate("/register");
   }
 
   function handleBackToLoginClick() {
-    setShowRegisterForm(false);
+    navigate("/login");
   }
 
   async function handleLogin(e) {
@@ -43,11 +44,13 @@ function App() {
 
     localStorage.setItem("token", data.token);
     setToken(data.token);
+    navigate("/applications");
   }
 
   function handleLogout() {
     localStorage.removeItem("token");
     setToken(null);
+    navigate("/login");
   }
 
   async function handleDelete(applicationId) {
@@ -126,158 +129,63 @@ function App() {
     }
   }, [token]);
 
-  if (token) {
-    return (
-      <Layout token={token} onLogout={handleLogout}>
-        <div className='w-full max-w-md bg-slate-800 rounded-xl shadow-lg p-8'>
-          {applications.length === 0 ? (
-            <p className='text-slate-400 text-sm'>No applications yet.</p>
-          ) : (
-            <ul className='flex flex-col gap-2'>
-              {applications.map((app) => (
-                <li
-                  key={app.id}
-                  className='bg-slate-900 border border-slate-700 rounded-md p-3'
-                >
-                  {editingApplication === app.id ? (
-                    <form
-                      onSubmit={handleEditSave}
-                      className='flex flex-col gap-3'
-                    >
-                      <input
-                        type='text'
-                        placeholder='Company name'
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
-                      />
-                      <input
-                        type='text'
-                        placeholder='Role / description'
-                        value={editDescription}
-                        onChange={(e) => setEditDescription(e.target.value)}
-                        className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
-                      />
-                      <select
-                        value={editStatus}
-                        onChange={(e) => setEditStatus(e.target.value)}
-                        className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
-                      >
-                        <option value='applied'>Applied</option>
-                        <option value='interviewing'>Interviewing</option>
-                        <option value='offered'>Offered</option>
-                        <option value='rejected'>Rejected</option>
-                      </select>
-                      {error && <p className='text-red-400 text-sm'>{error}</p>}
-                      <div className='flex gap-2'>
-                        <button
-                          type='submit'
-                          className='bg-blue-600 hover:bg-blue-700 rounded-md py-2 px-4 font-medium transition-colors'
-                        >
-                          Save
-                        </button>
-                        <button
-                          type='button'
-                          onClick={handleEditCancel}
-                          className='text-sm text-slate-400 hover:text-slate-200'
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </form>
-                  ) : (
-                    <>
-                      <p className='font-medium'>{app.name}</p>
-                      <p className='text-sm text-slate-400'>
-                        {app.description}
-                      </p>
-                      <p className='text-sm text-slate-400'>
-                        Status: {app.status}
-                      </p>
-                      <div className='flex gap-3 mt-2'>
-                        <button
-                          onClick={() => handleEditClick(app)}
-                          className='text-sm text-blue-400 hover:text-blue-500'
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(app.id)}
-                          className='text-sm text-red-400 hover:text-red-500'
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <div>
-            <h2 className='text-lg font-medium mb-3 mt-6'>
-              Add a New Application
-            </h2>
-            <ApplicationForm token={token} onCreated={handleCreated} />
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (showRegisterForm) {
-    return (
-      <Layout token={token} onLogout={handleLogout}>
-        <div className='w-full max-w-md bg-slate-800 rounded-xl shadow-lg p-8'>
-          <RegisterForm onSuccess={handleBackToLoginClick} />
-          <button
-            type='button'
-            onClick={handleBackToLoginClick}
-            className='w-full mt-3 text-sm text-slate-400 hover:text-slate-200 transition-colors'
-          >
-            Back to login
-          </button>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
-    <Layout token={token} onLogout={handleLogout}>
-      <div className='w-full max-w-md bg-slate-800 rounded-xl shadow-lg p-8'>
-        <form onSubmit={handleLogin} className='flex flex-col gap-3'>
-          <input
-            type='email'
-            placeholder='Email'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
+    <Routes>
+      <Route
+        path='/login'
+        element={
+          <LoginPage
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            error={error}
+            handleLogin={handleLogin}
+            handleRegisterClick={handleRegisterClick}
+            token={token}
+            onLogout={handleLogout}
           />
-          <input
-            type='password'
-            placeholder='Password'
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className='px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors'
+        }
+      />
+      <Route
+        path='/register'
+        element={
+          <RegisterPage
+            onSuccess={handleBackToLoginClick}
+            handleBackToLoginClick={handleBackToLoginClick}
+            token={token}
+            onLogout={handleLogout}
           />
-          {error && <p className='text-red-400 text-sm'>{error}</p>}
-          <button
-            type='submit'
-            className='bg-blue-600 hover:bg-blue-700 rounded-md py-2 font-medium transition-colors'
-          >
-            Log in
-          </button>
-        </form>
-        <button
-          type='button'
-          onClick={handleRegisterClick}
-          className='w-full mt-3 text-sm text-slate-400 hover:text-slate-200 transition-colors'
-        >
-          Don't have an account? Register
-        </button>
-      </div>
-    </Layout>
+        }
+      />
+      <Route
+        path='/applications'
+        element={
+          <ApplicationsPage
+            token={token}
+            onLogout={handleLogout}
+            applications={applications}
+            error={error}
+            editingApplication={editingApplication}
+            editName={editName}
+            setEditName={setEditName}
+            editDescription={editDescription}
+            setEditDescription={setEditDescription}
+            editStatus={editStatus}
+            setEditStatus={setEditStatus}
+            handleEditClick={handleEditClick}
+            handleEditSave={handleEditSave}
+            handleEditCancel={handleEditCancel}
+            handleDelete={handleDelete}
+            handleCreated={handleCreated}
+          />
+        }
+      />
+      <Route
+        path='*'
+        element={<Navigate to={token ? "/applications" : "/login"} />}
+      />
+    </Routes>
   );
 }
 
