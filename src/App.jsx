@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import ApplicationsPage from "./pages/ApplicationsPage.jsx";
+import AdminPage from "./pages/AdminPage.jsx";
 
 function App() {
   const [email, setEmail] = useState("");
@@ -180,6 +181,10 @@ function App() {
             handleCreated={handleCreated}
           />
         }
+      />
+      <Route
+        path='/admin'
+        element={<AdminPage token={token} onLogout={handleLogout} />}
       />
       <Route
         path='*'
