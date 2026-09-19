@@ -1,15 +1,33 @@
+import { Link } from "react-router-dom";
+
 function Navbar({ token, onLogout }) {
   return (
-    <nav className="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
-      <span className="text-lg font-semibold">Job Track</span>
-      {token && (
-        <button
-          onClick={onLogout}
-          className="text-sm border border-slate-600 rounded-md px-3 py-1.5 hover:bg-slate-700 transition-colors"
+    <nav className='bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center'>
+      <span className='text-lg font-semibold'>Job Track</span>
+      <div className='flex items-center gap-4'>
+        <Link
+          to='/jobs'
+          className='text-sm text-slate-300 hover:text-white transition-colors'
         >
-          Log out
-        </button>
-      )}
+          Jobs
+        </Link>
+        {token && (
+          <>
+            <Link
+              to='/applications'
+              className='text-sm text-slate-300 hover:text-white transition-colors'
+            >
+              My applications
+            </Link>
+            <button
+              onClick={onLogout}
+              className='text-sm border border-slate-600 rounded-md px-3 py-1.5 hover:bg-slate-700 transition-colors'
+            >
+              Log out
+            </button>
+          </>
+        )}
+      </div>
     </nav>
   );
 }
