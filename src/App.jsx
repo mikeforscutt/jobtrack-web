@@ -5,6 +5,7 @@ import RegisterPage from "./pages/RegisterPage.jsx";
 import ApplicationsPage from "./pages/ApplicationsPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import JobsPage from "./pages/JobsPage.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
   const [email, setEmail] = useState("");
@@ -163,29 +164,35 @@ function App() {
       <Route
         path='/applications'
         element={
-          <ApplicationsPage
-            token={token}
-            onLogout={handleLogout}
-            applications={applications}
-            error={error}
-            editingApplication={editingApplication}
-            editName={editName}
-            setEditName={setEditName}
-            editDescription={editDescription}
-            setEditDescription={setEditDescription}
-            editStatus={editStatus}
-            setEditStatus={setEditStatus}
-            handleEditClick={handleEditClick}
-            handleEditSave={handleEditSave}
-            handleEditCancel={handleEditCancel}
-            handleDelete={handleDelete}
-            handleCreated={handleCreated}
-          />
+          <ProtectedRoute token={token}>
+            <ApplicationsPage
+              token={token}
+              onLogout={handleLogout}
+              applications={applications}
+              error={error}
+              editingApplication={editingApplication}
+              editName={editName}
+              setEditName={setEditName}
+              editDescription={editDescription}
+              setEditDescription={setEditDescription}
+              editStatus={editStatus}
+              setEditStatus={setEditStatus}
+              handleEditClick={handleEditClick}
+              handleEditSave={handleEditSave}
+              handleEditCancel={handleEditCancel}
+              handleDelete={handleDelete}
+              handleCreated={handleCreated}
+            />
+          </ProtectedRoute>
         }
       />
       <Route
         path='/admin'
-        element={<AdminPage token={token} onLogout={handleLogout} />}
+        element={
+          <ProtectedRoute token={token}>
+            <AdminPage token={token} onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
       />
       <Route
         path='/jobs'

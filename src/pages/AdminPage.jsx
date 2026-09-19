@@ -14,15 +14,10 @@ function AdminPage({ token, onLogout }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!token) {
-			navigate("/login");
-			return;
-  	}
-
-		if (!isUserAdmin(token)) {
-			navigate("/applications");
-			return;
-  	}
+    if (!isUserAdmin(token)) {
+      navigate("/applications");
+      return;
+    }
 
     async function fetchStats() {
       const response = await fetch("http://localhost:3000/admin/stats", {
