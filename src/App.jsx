@@ -14,11 +14,8 @@ function App() {
   const [error, setError] = useState("");
   const [applications, setApplications] = useState([]);
   const [editStatus, setEditStatus] = useState("applied");
-  const navigate = useNavigate();
-
   const [editingApplication, setEditingApplication] = useState(null);
-  const [editName, setEditName] = useState("");
-  const [editDescription, setEditDescription] = useState("");
+  const navigate = useNavigate();
 
   function handleRegisterClick() {
     navigate("/register");
@@ -72,8 +69,6 @@ function App() {
 
   function handleEditClick(app) {
     setEditingApplication(app.id);
-    setEditName(app.name);
-    setEditDescription(app.description);
     setEditStatus(app.status);
   }
 
@@ -89,11 +84,7 @@ function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          name: editName,
-          description: editDescription,
-          status: editStatus,
-        }),
+        body: JSON.stringify({ status: editStatus }),
       },
     );
 
@@ -104,18 +95,16 @@ function App() {
       return;
     }
 
-    setApplications(
-      applications.map((app) => (app.id === editingApplication ? data : app)),
-    );
+   setApplications(
+     applications.map((app) =>
+       app.id === editingApplication ? { ...app, status: data.status } : app,
+     ),
+   );
     setEditingApplication(null);
   }
 
   function handleEditCancel() {
     setEditingApplication(null);
-  }
-
-  async function handleCreated(newApplication) {
-    setApplications([...applications, newApplication]);
   }
 
   async function fetchApplications(authToken) {
@@ -171,17 +160,12 @@ function App() {
               applications={applications}
               error={error}
               editingApplication={editingApplication}
-              editName={editName}
-              setEditName={setEditName}
-              editDescription={editDescription}
-              setEditDescription={setEditDescription}
               editStatus={editStatus}
               setEditStatus={setEditStatus}
               handleEditClick={handleEditClick}
               handleEditSave={handleEditSave}
               handleEditCancel={handleEditCancel}
               handleDelete={handleDelete}
-              handleCreated={handleCreated}
             />
           </ProtectedRoute>
         }
