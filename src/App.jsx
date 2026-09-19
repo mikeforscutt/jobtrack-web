@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import ApplicationsPage from "./pages/ApplicationsPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
+import JobsPage from "./pages/JobsPage.jsx";
 
 function App() {
   const [email, setEmail] = useState("");
@@ -185,6 +186,10 @@ function App() {
       <Route
         path='/admin'
         element={<AdminPage token={token} onLogout={handleLogout} />}
+      />
+      <Route
+        path='/jobs'
+        element={<JobsPage token={token} onLogout={handleLogout} />}
       />
       <Route
         path='*'
