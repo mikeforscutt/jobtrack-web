@@ -5,27 +5,32 @@ import Layout from "../components/layout/Layout.jsx";
 function JobsPage({ token, onLogout, applications, onApplied }) {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   const appliedJobIds = applications.map((app) => app.job_id);
 
   useEffect(() => {
     async function fetchJobs() {
       try {
-        const response = await fetch("http://localhost:3000/jobs");
+        const response = await fetch(
+          `http://localhost:3000/jobs?pageNumber=${currentPage}&pageSize=9`,
+        );
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(data.error);
         }
 
-        setJobs(data);
+        setJobs(data.jobs);
+        setTotalPages(Math.ceil(data.totalJobs / data.pageSize));
       } catch (error) {
         console.error(error);
       }
     }
 
     fetchJobs();
-  }, []);
+  }, [currentPage]);
 
   const handleApply = async (jobId) => {
     if (!token) {
@@ -55,30 +60,75 @@ function JobsPage({ token, onLogout, applications, onApplied }) {
 
   return (
     <Layout token={token} onLogout={onLogout}>
-      <div className='w-full max-w-md bg-slate-800 rounded-xl shadow-lg p-8'>
-        <h1 className='text-2xl font-semibold mb-6'>Jobs</h1>
-        <ul className='flex flex-col gap-2'>
-          {jobs.map((job) => (
-            <li
-              key={job.id}
-              className='bg-slate-900 border border-slate-700 rounded-md p-3'
-            >
-              <h2 className='text-lg font-semibold'>{job.company_name}</h2>
-              <p className='text-sm text-slate-400 mb-2'>{job.job_title}</p>
-              {appliedJobIds.includes(job.id) ? (
-                <span className='text-sm text-green-400'>Applied</span>
-              ) : (
-                <button
-                  type='button'
-                  onClick={() => handleApply(job.id)}
-                  className='text-sm border border-slate-600 rounded-md px-3 py-1.5 hover:bg-slate-700 transition-colors'
-                >
-                  Apply
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
+      <div className='w-full max-w-6xl px-4'>
+        <div className='flex items-center justify-between mb-8'>
+          <div>
+            <h1 className='text-3xl font-semibold'>Open positions</h1>
+            <p className='text-slate-400 mt-1'>
+              {totalPages > 0 ? `Page ${currentPage} of ${totalPages}` : ""}
+            </p>
+          </div>
+        </div>
+
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 items-start'>
+          {jobs.map((job) => {
+            const applied = appliedJobIds.includes(job.id);
+            return (
+              <div
+                key={job.id}
+                className='bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between hover:border-blue-500/50 transition-colors'
+              >
+                <div>
+                  <div className='w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-4'>
+                    <span className='text-blue-400 font-semibold text-sm'>
+                      {job.company_name.charAt(0)}
+                    </span>
+                  </div>
+                  <h2 className='text-lg font-semibold mb-1'>
+                    {job.company_name}
+                  </h2>
+                  <p className='text-sm text-slate-400 mb-4'>{job.job_title}</p>
+                </div>
+
+                {applied ? (
+                  <span className='text-sm font-medium text-green-400 flex items-center gap-1.5'>
+                    ✓ Applied
+                  </span>
+                ) : (
+                  <button
+                    type='button'
+                    onClick={() => handleApply(job.id)}
+                    className='bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md py-2 transition-colors'
+                  >
+                    Apply now
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className='flex justify-center items-center gap-4'>
+          <button
+            type='button'
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+            disabled={currentPage === 1}
+            className='text-sm border border-slate-600 rounded-md px-4 py-2 hover:bg-slate-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent'
+          >
+            Previous
+          </button>
+          <span className='text-sm text-slate-400'>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            type='button'
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={currentPage === totalPages}
+            className='text-sm border border-slate-600 rounded-md px-4 py-2 hover:bg-slate-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent'
+          >
+            Next
+          </button>
+        </div>
       </div>
     </Layout>
   );
