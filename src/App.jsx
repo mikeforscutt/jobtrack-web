@@ -180,7 +180,14 @@ function App() {
       />
       <Route
         path='/jobs'
-        element={<JobsPage token={token} onLogout={handleLogout} />}
+        element={
+          <JobsPage
+            token={token}
+            onLogout={handleLogout}
+            applications={applications}
+            onApplied={() => fetchApplications(token)}
+          />
+        }
       />
       <Route
         path='*'
