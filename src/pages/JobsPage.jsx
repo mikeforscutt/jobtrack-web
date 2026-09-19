@@ -60,7 +60,7 @@ function JobsPage({ token, onLogout, applications, onApplied }) {
 
   return (
     <Layout token={token} onLogout={onLogout}>
-      <div className='w-full max-w-6xl px-4'>
+      <div className='w-full max-w-6xl px-4 mt-12'>
         <div className='flex items-center justify-between mb-8'>
           <div>
             <h1 className='text-3xl font-semibold'>Open positions</h1>
