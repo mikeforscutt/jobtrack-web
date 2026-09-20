@@ -26,7 +26,8 @@ function JobsPage({ token, onLogout, applications, onApplied }) {
     async function fetchJobs() {
       try {
         const response = await fetch(
-          `http://localhost:3000/jobs?pageNumber=${currentPage}&pageSize=9&search=${encodeURIComponent(debouncedSearch)}`,
+          import.meta.env.VITE_API_URL +
+            `/jobs?pageNumber=${currentPage}&pageSize=9&search=${encodeURIComponent(debouncedSearch)}`,
         );
         const data = await response.json();
 
@@ -51,14 +52,17 @@ function JobsPage({ token, onLogout, applications, onApplied }) {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/applications", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        import.meta.env.VITE_API_URL + "/applications",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ job_id: jobId }),
         },
-        body: JSON.stringify({ job_id: jobId }),
-      });
+      );
 
       if (!response.ok) {
         return;

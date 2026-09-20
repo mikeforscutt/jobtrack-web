@@ -10,8 +10,8 @@ function HomePage({ token, onLogout }) {
     async function fetchData() {
       try {
         const [recentResponse, popularResponse] = await Promise.all([
-          fetch("http://localhost:3000/jobs/recent"),
-          fetch("http://localhost:3000/jobs/popular"),
+          fetch(import.meta.env.VITE_API_URL + "/jobs/recent"),
+          fetch(import.meta.env.VITE_API_URL + "/jobs/popular"),
         ]);
         const [recentData, popularData] = await Promise.all([
           recentResponse.json(),
