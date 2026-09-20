@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
@@ -124,6 +125,10 @@ function App() {
   return (
     <Routes>
       <Route
+        path='/'
+        element={<HomePage token={token} onLogout={handleLogout} />}
+      />
+      <Route
         path='/login'
         element={
           <LoginPage
@@ -189,10 +194,7 @@ function App() {
           />
         }
       />
-      <Route
-        path='*'
-        element={<Navigate to={token ? "/profile" : "/login"} />}
-      />
+      <Route path='*' element={<Navigate to='/' />} />
     </Routes>
   );
 }
