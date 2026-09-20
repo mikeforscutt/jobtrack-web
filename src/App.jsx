@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
-import ApplicationsPage from "./pages/ApplicationsPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import JobsPage from "./pages/JobsPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -44,7 +44,7 @@ function App() {
 
     localStorage.setItem("token", data.token);
     setToken(data.token);
-    navigate("/applications");
+    navigate("/profile");
   }
 
   function handleLogout() {
@@ -95,11 +95,11 @@ function App() {
       return;
     }
 
-   setApplications(
-     applications.map((app) =>
-       app.id === editingApplication ? { ...app, status: data.status } : app,
-     ),
-   );
+    setApplications(
+      applications.map((app) =>
+        app.id === editingApplication ? { ...app, status: data.status } : app,
+      ),
+    );
     setEditingApplication(null);
   }
 
@@ -151,10 +151,10 @@ function App() {
         }
       />
       <Route
-        path='/applications'
+        path='/profile'
         element={
           <ProtectedRoute token={token}>
-            <ApplicationsPage
+            <ProfilePage
               token={token}
               onLogout={handleLogout}
               applications={applications}
@@ -191,7 +191,7 @@ function App() {
       />
       <Route
         path='*'
-        element={<Navigate to={token ? "/applications" : "/login"} />}
+        element={<Navigate to={token ? "/profile" : "/login"} />}
       />
     </Routes>
   );
