@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 function Navbar({ token, onLogout }) {
   return (
     <nav className='bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center'>
-      <span className='text-lg font-semibold'>Job Track</span>
+      <Link to={token ? "/jobs" : "/"} className='text-lg font-semibold'>
+        Job Track
+      </Link>
       <div className='flex items-center gap-4'>
         <Link
           to='/jobs'
@@ -11,14 +13,14 @@ function Navbar({ token, onLogout }) {
         >
           Jobs
         </Link>
-        {token && (
+        {token ? (
           <>
             <Link to='/profile'>
               <div className='w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center hover:bg-blue-500/20 transition-colors'>
                 <span className='text-blue-400 font-semibold text-xs'>
                   {JSON.parse(atob(token.split(".")[1]))
-                    .email.charAt(0)
-                    .toUpperCase()}
+                    .email?.charAt(0)
+                    .toUpperCase() || "?"}
                 </span>
               </div>
             </Link>
@@ -29,6 +31,13 @@ function Navbar({ token, onLogout }) {
               Log out
             </button>
           </>
+        ) : (
+          <Link
+            to='/login'
+            className='text-sm border border-slate-600 rounded-md px-3 py-1.5 hover:bg-slate-700 transition-colors'
+          >
+            Log in
+          </Link>
         )}
       </div>
     </nav>
