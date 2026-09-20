@@ -13,11 +13,14 @@ function Navbar({ token, onLogout }) {
         </Link>
         {token && (
           <>
-            <Link
-              to='/applications'
-              className='text-sm text-slate-300 hover:text-white transition-colors'
-            >
-              My applications
+            <Link to='/profile'>
+              <div className='w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center hover:bg-blue-500/20 transition-colors'>
+                <span className='text-blue-400 font-semibold text-xs'>
+                  {JSON.parse(atob(token.split(".")[1]))
+                    .email.charAt(0)
+                    .toUpperCase()}
+                </span>
+              </div>
             </Link>
             <button
               onClick={onLogout}
