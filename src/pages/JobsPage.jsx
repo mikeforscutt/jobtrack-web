@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout.jsx";
 
@@ -7,14 +7,26 @@ function JobsPage({ token, onLogout, applications, onApplied }) {
   const [jobs, setJobs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const debounceTimeout = useRef(null);
 
   const appliedJobIds = applications.map((app) => app.job_id);
+
+  useEffect(() => {
+    debounceTimeout.current = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setCurrentPage(1);
+    }, 400);
+
+    return () => clearTimeout(debounceTimeout.current);
+  }, [searchInput]);
 
   useEffect(() => {
     async function fetchJobs() {
       try {
         const response = await fetch(
-          `http://localhost:3000/jobs?pageNumber=${currentPage}&pageSize=9`,
+          `http://localhost:3000/jobs?pageNumber=${currentPage}&pageSize=9&search=${encodeURIComponent(debouncedSearch)}`,
         );
         const data = await response.json();
 
@@ -30,7 +42,7 @@ function JobsPage({ token, onLogout, applications, onApplied }) {
     }
 
     fetchJobs();
-  }, [currentPage]);
+  }, [currentPage, debouncedSearch]);
 
   const handleApply = async (jobId) => {
     if (!token) {
@@ -61,7 +73,7 @@ function JobsPage({ token, onLogout, applications, onApplied }) {
   return (
     <Layout token={token} onLogout={onLogout}>
       <div className='w-full max-w-6xl px-4 mt-12'>
-        <div className='flex items-center justify-between mb-8'>
+        <div className='flex items-center justify-between mb-6'>
           <div>
             <h1 className='text-3xl font-semibold'>Open positions</h1>
             <p className='text-slate-400 mt-1'>
@@ -69,6 +81,14 @@ function JobsPage({ token, onLogout, applications, onApplied }) {
             </p>
           </div>
         </div>
+
+        <input
+          type='text'
+          placeholder='Search by company or role'
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className='w-full max-w-sm px-3 py-2 rounded-md bg-slate-900 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors mb-6'
+        />
 
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 items-start'>
           {jobs.map((job) => {
@@ -107,6 +127,12 @@ function JobsPage({ token, onLogout, applications, onApplied }) {
             );
           })}
         </div>
+
+        {jobs.length === 0 && (
+          <p className='text-slate-400 text-center mb-8'>
+            No jobs match your search.
+          </p>
+        )}
 
         <div className='flex justify-center items-center gap-4'>
           <button
