@@ -30,7 +30,7 @@ function App() {
     e.preventDefault();
     setError("");
 
-    const response = await fetch("http://localhost:3000/login", {
+    const response = await fetch(import.meta.env.VITE_API_URL + "/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -56,7 +56,7 @@ function App() {
 
   async function handleDelete(applicationId) {
     const response = await fetch(
-      `http://localhost:3000/applications/${applicationId}`,
+      import.meta.env.VITE_API_URL + `/applications/${applicationId}`,
       {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -78,7 +78,7 @@ function App() {
     setError("");
 
     const response = await fetch(
-      `http://localhost:3000/applications/${editingApplication}`,
+      import.meta.env.VITE_API_URL + `/applications/${editingApplication}`,
       {
         method: "PUT",
         headers: {
@@ -109,9 +109,12 @@ function App() {
   }
 
   async function fetchApplications(authToken) {
-    const response = await fetch("http://localhost:3000/applications", {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
+    const response = await fetch(
+      import.meta.env.VITE_API_URL + "/applications",
+      {
+        headers: { Authorization: `Bearer ${authToken}` },
+      },
+    );
     const data = await response.json();
     setApplications(data);
   }
